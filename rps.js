@@ -11,16 +11,27 @@ const RPS_EQUAL = 0;
 const RPS_HUMAN_WON = 1;
 const RPS_COMPUTER_WON = 2;
 
+const MAX_ROUNDS = 5;
+
 let humanChoice = NOCHOICE;
 let computerChoice = NOCHOICE;
 
 const rpsPromptStr = "rock, paper, or scissors?";
-const rpsRetryStr = "try again!\nrock, paper, or scissors?";
+const rpsRetryStr = "try again!\n";
 const rpsEqualStr = "a tie!\n";
 const rpsHumanWonStr = "you won!";
 const rpsComputerWonStr = "you lost...";
 
 let rpsResult = 0;
+
+let roundsPlayed = 0;
+let scoreHuman = 0;
+let scoreComputer = 0;
+
+let currRoundStr = "";
+let currScoreStr = "";
+
+let headerStr = "";
 
 function getComputerChoice() {
     let temp = Math.random();
@@ -37,7 +48,7 @@ function getComputerChoice() {
 }
 
 function promptHuman(str){
-    let humanRPS = prompt(str);
+    let humanRPS = prompt(str).toLowerCase();
     return humanRPS;
 }
 function getHumanChoice(str) {
@@ -114,23 +125,43 @@ function computeRPS() {
     }
 }
 
-if (getHumanChoice(rpsPromptStr) != RPS_ERR_OK) {
-    while (getHumanChoice(rpsRetryStr) != RPS_ERR_OK) {
-    }
-};
-
-getComputerChoice();
-rpsResult = computeRPS();
-
-while (rpsResult == RPS_EQUAL) {
-    while (getHumanChoice(rpsEqualStr + rpsPromptStr) != RPS_ERR_OK) {
-    }
-    getComputerChoice();
-    rpsResult = computeRPS();
+function prepHeader() {
+    currRoundStr = "Round: " + (roundsPlayed+1) + " /" + MAX_ROUNDS + "\n";
+    currScoreStr = "Human: " + scoreHuman + "\nComputer: " + scoreComputer + "\n\n";
+    headerStr = currRoundStr + currScoreStr;
 }
 
-if (rpsResult == RPS_HUMAN_WON) {
-    window.alert(rpsHumanWonStr);
+while (roundsPlayed < MAX_ROUNDS) {
+    prepHeader();
+    
+    if (getHumanChoice(headerStr + rpsPromptStr) != RPS_ERR_OK) {
+        while (getHumanChoice(headerStr + rpsRetryStr + rpsPromptStr) != RPS_ERR_OK) {
+        }
+    };
+    
+    getComputerChoice();
+    rpsResult = computeRPS();
+    while (rpsResult == RPS_EQUAL) {
+        while (getHumanChoice(headerStr + rpsEqualStr + rpsPromptStr) != RPS_ERR_OK) {
+        }
+        getComputerChoice();
+        rpsResult = computeRPS();
+    }
+    if (rpsResult == RPS_HUMAN_WON) {
+        scoreHuman += 1;
+        prepHeader();
+        window.alert(headerStr + rpsHumanWonStr);
+    } else {
+        scoreComputer += 1;
+        prepHeader();
+        window.alert(headerStr + rpsComputerWonStr);
+    }
+    roundsPlayed += 1;
+}
+
+if (scoreHuman > scoreComputer) {
+    currScoreStr = "RESULTS:\n" + "Human: " + scoreHuman + "\nComputer: " + scoreComputer + "\n\n";
+    window.alert(currScoreStr + "YOU WON!!!!!");
 } else {
-    window.alert(rpsComputerWonStr);
+    window.alert(currScoreStr + "YOU LOST.....");
 }
