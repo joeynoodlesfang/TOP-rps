@@ -14,7 +14,11 @@ const RPS_COMPUTER_WON = 2;
 const MAX_ROUNDS = 5;
 
 let humanChoice = NOCHOICE;
+let humanChoiceStr = "";
 let computerChoice = NOCHOICE;
+let computerChoiceStr = "";
+
+let choicesStr = "";
 
 const rpsPromptStr = "rock, paper, or scissors?";
 const rpsRetryStr = "try again!\n";
@@ -36,15 +40,17 @@ let headerStr = "";
 function getComputerChoice() {
     let temp = Math.random();
     if ( temp < (1/3)) {
-        console.log("computer chose.. rock! " + temp);
+        computerChoiceStr = "computer chose.. rock! ";
         computerChoice = ROCK;
     } else if (temp < (2/3)) {
-        console.log("computer chose.. paper! " + temp);
+        computerChoiceStr = "computer chose.. paper! ";
         computerChoice = PAPER;
     } else {
-        console.log("computer chose.. scissors! " + temp);
+        computerChoiceStr = "computer chose.. scissors! ";
         computerChoice = SCISSORS;
     }
+    console.log(computerChoiceStr + temp);
+    return;
 }
 
 function promptHuman(str){
@@ -58,12 +64,15 @@ function getHumanChoice(str) {
     switch (humanRPS) {
         case "rock":
             humanChoice = ROCK;
+            humanChoiceStr = "You chose.. rock!";
             break;
         case "paper":
             humanChoice = PAPER;
+            humanChoiceStr = "You chose.. paper!";
             break;
         case "scissors":
             humanChoice = SCISSORS;
+            humanChoiceStr = "You chose.. scissors!";
             break;
         default:
             err_t = RPS_ERR_BAD_ENTRY;
@@ -126,9 +135,13 @@ function computeRPS() {
 }
 
 function prepHeader() {
-    currRoundStr = "Round: " + (roundsPlayed+1) + " /" + MAX_ROUNDS + "\n";
+    currRoundStr = "Round: " + (roundsPlayed+1) + "/" + MAX_ROUNDS + "\n";
     currScoreStr = "Human: " + scoreHuman + "\nComputer: " + scoreComputer + "\n\n";
     headerStr = currRoundStr + currScoreStr;
+}
+
+function prepReportChoices() {
+    choicesStr = humanChoiceStr + "\n" + computerChoiceStr + "\n\n";
 }
 
 while (roundsPlayed < MAX_ROUNDS) {
@@ -140,9 +153,10 @@ while (roundsPlayed < MAX_ROUNDS) {
     };
     
     getComputerChoice();
+    prepReportChoices();
     rpsResult = computeRPS();
     while (rpsResult == RPS_EQUAL) {
-        while (getHumanChoice(headerStr + rpsEqualStr + rpsPromptStr) != RPS_ERR_OK) {
+        while (getHumanChoice(headerStr + choicesStr + rpsEqualStr + rpsPromptStr) != RPS_ERR_OK) {
         }
         getComputerChoice();
         rpsResult = computeRPS();
@@ -150,11 +164,11 @@ while (roundsPlayed < MAX_ROUNDS) {
     if (rpsResult == RPS_HUMAN_WON) {
         scoreHuman += 1;
         prepHeader();
-        window.alert(headerStr + rpsHumanWonStr);
+        window.alert(headerStr + choicesStr + rpsHumanWonStr);
     } else {
         scoreComputer += 1;
         prepHeader();
-        window.alert(headerStr + rpsComputerWonStr);
+        window.alert(headerStr + choicesStr + rpsComputerWonStr);
     }
     roundsPlayed += 1;
 }
